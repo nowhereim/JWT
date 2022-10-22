@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"
+    integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<script>
+
+    //도큐먼트 레디 함수
+    
+
+    function test(){
+        let id = $('#id').val();
+        let password = $('#pw').val();
+        $.ajax({
+            url: '/login',
+            type: 'POST',
+            data: {
+                useId: id,
+                password: password
+            },
+            success: function({data}){
+                console.log({data})
+                localStorage.setItem('token', data);
+                
+            }
+        });
+       }
+
+       let c = () => {
+            $.ajax({
+                url:'/logout',
+                type: 'POST',
+                contentType: "application/json;charset=utf-8",
+                data:JSON.stringify({
+                    token:localStorage.getItem('token')
+                }),
+                success: function(res){
+                    if(res === '로그아웃'){
+                    localStorage.removeItem('token');
+                    alert('로그아웃 되었습니다.');
+                }else{
+                    alert(res.data)
+                }
+            }
+            })
+       }
+
+       let s = () => {
+        let id = $('#id').val();
+        let password = $('#pw').val();
+            $.ajax({
+                url:'/sign',
+                type: 'POST',
+                contentType: "application/json;charset=utf-8",
+                headers: {
+                    'Authorization':`Bearer ${localStorage.getItem('token')}`
+                },
+                data:JSON.stringify({
+                    useId: id,
+                    password: password
+                }),
+                success: function(res){
+                    alert(res)
+            }
+            })
+       }
+
+       let main = () => {
+        $.ajax({
+                url:'/auth',
+                type: 'GET',
+                contentType: "application/json;charset=utf-8",
+                headers: {
+                    'Authorization':`Bearer ${localStorage.getItem('token')}`
+                },
+                data:JSON.stringify({
+                }),
+                success: function(res, status, xhr){
+                    if(res==='인증완료'){
+                        window.location.href="/main"
+                    }else{
+                        alert(res)
+                    }
+            }
+            })
+       }
+
+
+
+
+
+    </script>
+<body>
+    <input id="id" type="text">jwt</input><button onclick="test()">작성</button>
+    <p><input id="pw" type="text">jwt</input></p>
+    <button onclick="c()">logout</button>
+    <button onclick="s()">singup</button>
+    <button onclick="main()">이동</button>
+</body>
+</html>
